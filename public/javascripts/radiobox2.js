@@ -1,6 +1,6 @@
 var Radiobox2Api = window.Radiobox2Api || {
   data: {
-    currentChannelId: 3,
+    currentChannelId: 2,
     currentBroadcast: undefined,
     currentTrack: undefined,
     _gettingBroadcastInfo: false, // avoid doing the same request twice and stuff
