@@ -31,8 +31,10 @@ CapuccinoApi.get_latest_broadcast = function() {
 CapuccinoApi.set_broadcast = function(broadcast) {
   Radiobox2Api.data.currentBroadcast = broadcast;
   //Radiobox2Api.getCurrentItems();
-  CapuccinoApi.get_items_for_broadcast(broadcast.id);
   $(document).trigger('Radiobox2.broadcastChanged', [broadcast]);  
+
+  CapuccinoApi.get_items_for_broadcast(broadcast.id);
+  CapuccinoApi.get_tracks_during_broadcast();
 };
 
 CapuccinoApi.get_items_for_broadcast = function(broadcast_id) {
