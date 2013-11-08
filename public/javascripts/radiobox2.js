@@ -195,7 +195,7 @@ Radiobox2.emptySongfile = function() {
 };
 
 Radiobox2.emptyItems = function() {
-  $('#broadcast-item dl').html('');
+  $('#broadcast-items dl').html('');
 };
 
 Radiobox2.emptyPage = function() {
@@ -316,6 +316,7 @@ Radiobox2.programChanged = function() {
 
 Radiobox2.itemsChanged = function() {
   console.log('items changed!');
+  console.dir(Radiobox2Api.data.currentItems);
 
   Radiobox2.emptyItems();
   

@@ -1,7 +1,8 @@
 var CapuccinoApi = window.CapuccinoApi || {
   data: {
     _gettingTracks: false,
-    tracks: []
+    tracks: [],
+    broadcasts: {},
   },
 };
 
@@ -22,15 +23,37 @@ CapuccinoApi.get_latest_broadcast = function() {
       var broadcast = data.results[0];
       console.dir(broadcast);
       Radiobox2Api.data._gettingBroadcastInfo = false;
-      //if ((typeof(Radiobox2Api.data.currentBroadcast) !== 'undefined') && (broadcast.id == Radiobox2Api.data.currentBroadcast.id)) {
-        // do nothing?
-      //} else {
-      Radiobox2Api.data.currentBroadcast = broadcast;
-      Radiobox2Api.getCurrentItems();
-      $(document).trigger('Radiobox2.broadcastChanged', [broadcast]);
-      //}
+      CapuccinoApi.set_broadcast(broadcast);
     }
   , 'json');
+};
+
+CapuccinoApi.set_broadcast = function(broadcast) {
+  Radiobox2Api.data.currentBroadcast = broadcast;
+  //Radiobox2Api.getCurrentItems();
+  CapuccinoApi.get_items_for_broadcast(broadcast.id);
+  $(document).trigger('Radiobox2.broadcastChanged', [broadcast]);  
+};
+
+CapuccinoApi.get_items_for_broadcast = function(broadcast_id) {
+// http://radiobox2.omroep.nl/item/search.json?q=broadcast.id:'11329'
+  if (Radiobox2Api.data._gettingCurrentItems) {
+    return;
+  }
+  console.log('trying to get current items ...');
+  Radiobox2Api.data._gettingCurrentItems = true;
+  $.get(
+    "http://radiobox2.omroep.nl/item/search.json?q=broadcast.id:'" + broadcast_id + "'",
+    function(data) {
+      console.log('item:');
+      console.dir(data);
+      Radiobox2Api.data._gettingCurrentItems = false;
+      Radiobox2Api.data.currentItems = data.results;
+      // FIXME: should compare before calling change event ...
+      $(document).trigger('Radiobox2.itemsChanged', [data.results]);
+    }
+  , 'json');
+  
 };
 
 CapuccinoApi.get_programme_info = function() {
@@ -76,8 +99,31 @@ CapuccinoApi.get_tracks_during_broadcast = function() {
   , 'json');
 };
 
+CapuccinoApi.get_all_broadcasts = function() {
+  $.get(
+  "http://radiobox2.omroep.nl/broadcast/search.json?q=channel.id:'2' AND programme.id:'123' AND startdatetime<NOW&order=startdatetime:desc",
+    function (data) {
+      console.dir(data);
+      $.each(data.results, function (idx, broadcast) {
+        $('#broadcasts-dropdown ul.dropdown-menu').append(
+          $('<li><a href="#' + broadcast.id + '">' + broadcast.name + ' ' + moment(broadcast.startdatetime.replace(/T.*$/, '')).format("D MMM YYYY") + '</a></li>')
+        );
+        CapuccinoApi.data.broadcasts[broadcast.id] = broadcast;
+      });
+      
+      $('#broadcasts-dropdown ul.dropdown-menu li a').click(function() {
+        var broadcast_id = $(this).attr('href').replace('#', '');
+        console.log('Aflevering ' + broadcast_id + ' geselecteerd!');
+        console.dir(CapuccinoApi.data.broadcasts[broadcast_id]);
+        CapuccinoApi.set_broadcast(CapuccinoApi.data.broadcasts[broadcast_id]);
+      });
+    }
+  , 'json');  
+}
+
 $(document).ready(function() {
   CapuccinoApi.get_programme_info();
+  CapuccinoApi.get_all_broadcasts();
   if (CapuccinoApi.is_live()) {
     console.log('capuccino live');
     Radiobox2.init();
