@@ -15,17 +15,19 @@ var Radiobox2Api = window.Radiobox2Api || {
   },
 };
 
-Radiobox2Api.init = function() {
+Radiobox2Api.init = function(looping) {
   Radiobox2Api.getChannels();
   
-  setInterval(function() {
-      Radiobox2Api.getCurrentBroadcast();
-      Radiobox2Api.getCurrentItems();
-  }, 60000);
+  if (looping) {
+    setInterval(function() {
+        Radiobox2Api.getCurrentBroadcast();
+        Radiobox2Api.getCurrentItems();
+    }, 60000);
   
-  setInterval(function() {
-    Radiobox2Api.getCurrentTrack();
-  }, 10000);
+    setInterval(function() {
+      Radiobox2Api.getCurrentTrack();
+    }, 10000);
+  }
 };
 
 Radiobox2Api.getChannels = function() {
@@ -207,7 +209,7 @@ Radiobox2.channelChanged = function() {
   
 };
 
-Radiobox2.channelsReceived = function() {
+Radiobox2.channelsReceived = function(looping) {
   console.log('channels received !');
   for (var i in Radiobox2Api.data.full_channels) {
     if (Radiobox2Api.data.full_channels[i].type == "main") {
@@ -216,10 +218,13 @@ Radiobox2.channelsReceived = function() {
     }
   }
   
-  Radiobox2Api.setChannelId(Radiobox2Api.getChannelId());
+  if (!looping) {
+    Radiobox2Api.setChannelId(Radiobox2Api.getChannelId());
+  }
 };
 
 Radiobox2.broadcastChanged = function() {
+  console.log('changing broadcast!');
   var broadcast = Radiobox2Api.data.currentBroadcast;
 
   Radiobox2.emptyBroadcast();
@@ -291,9 +296,11 @@ Radiobox2.songfileChanged = function() {
   }
 };
 
-Radiobox2.init = function() {
+Radiobox2.init = function(do_loops) {
+  var looping = do_loops;
+
   $(document).bind('Radiobox2.channelsReceived', function() {
-    Radiobox2.channelsReceived();
+    Radiobox2.channelsReceived(looping);
   }).bind('Radiobox2.channelChanged', function() {
     Radiobox2.channelChanged();
   }).bind('Radiobox2.broadcastChanged', function() {
@@ -309,7 +316,7 @@ Radiobox2.init = function() {
     Radiobox2Api.setChannelId(channelId);
   });
 
-  Radiobox2Api.init();
+  Radiobox2Api.init(looping);
   
   setInterval(function() {
       Radiobox2.updateTimes();
@@ -317,6 +324,6 @@ Radiobox2.init = function() {
 };
 
 $(document).ready(function() {
-  console.log('hoi');
-  Radiobox2.init();
+  //console.log('hoi');
+  //Radiobox2.init();
 });
