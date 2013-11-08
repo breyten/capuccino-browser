@@ -6,9 +6,16 @@
   display: none;
 }
 
+#programme {
+  display: none;
+}
+
 #full-programme {
   padding: 20px;
 }
 .block {
   background: white;
+}
+.row {
+  margin-top: 20px;
 }

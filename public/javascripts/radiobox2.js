@@ -69,11 +69,14 @@ Radiobox2Api.getCurrentBroadcast = function() {
       console.dir(data);
       var broadcast = data.results[0];
       Radiobox2Api.data._gettingBroadcastInfo = false;
+      console.log('got current broadcast:');
+      console.dir(Radiobox2Api.data.currentBroadcast);
       if ((typeof(Radiobox2Api.data.currentBroadcast) !== 'undefined') && (broadcast.id == Radiobox2Api.data.currentBroadcast.id)) {
         // do nothing?
       } else {
         Radiobox2Api.data.currentBroadcast = broadcast;
         $(document).trigger('Radiobox2.broadcastChanged', [broadcast]);
+        Radiobox2Api.getCurrentItems();
       }
     }
   , 'json');
@@ -83,6 +86,7 @@ Radiobox2Api.getCurrentItems = function() {
   if (Radiobox2Api.data._gettingCurrentItems) {
     return;
   }
+  console.log('trying to get current items ...');
   Radiobox2Api.data._gettingCurrentItems = true;
   $.get(
     "http://radiobox2.omroep.nl/item/search.json?q=channel.id:'" + Radiobox2Api.getChannelId() + "'%20AND%20startdatetime%3CNOW%20AND%20stopdatetime%3ENOW'&order=startdatetime:desc&max-results=5",
@@ -190,12 +194,17 @@ Radiobox2.emptySongfile = function() {
   $('#track .player').html('');  
 };
 
+Radiobox2.emptyItems = function() {
+  $('#broadcast-item dl').html('');
+};
+
 Radiobox2.emptyPage = function() {
   Radiobox2.emptyChannelInfo();
   Radiobox2.emptyBroadcast();
   Radiobox2.emptyPresenter();
   Radiobox2.emptyTrack();
   Radiobox2.emptySongfile();
+  Radiobox2.emptyItems();
 };
 
 Radiobox2.channelChanged = function() {
@@ -305,6 +314,20 @@ Radiobox2.programChanged = function() {
   
 };
 
+Radiobox2.itemsChanged = function() {
+  console.log('items changed!');
+
+  Radiobox2.emptyItems();
+  
+  if (Radiobox2Api.data.currentItems.length > 0) {
+    $.each(Radiobox2Api.data.currentItems, function (idx, item) {
+      $('#broadcast-items dl').append($('<dt>' + item.name + '</dt><dd>' + item.description + '</dd>'));
+    });
+  } else {
+    $('#broadcast-items dl').html('<dt>Geen items</dt><dd>In deze uitzending zitten geen items</dd');
+  }
+};
+
 Radiobox2.init = function() {
   $(document).bind('Radiobox2.channelsReceived', function() {
     Radiobox2.channelsReceived();
@@ -335,6 +358,8 @@ Radiobox2.delayed_init = function() {
     Radiobox2.broadcastChanged();
   }).bind('Radiobox2.programChanged', function() {
     Radiobox2.programChanged();
+  }).bind('Radiobox2.itemsChanged', function() {
+    Radiobox2.itemsChanged();
   });
 
   Radiobox2Api.delayed_init();
