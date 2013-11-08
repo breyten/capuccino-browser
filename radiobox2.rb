@@ -12,7 +12,7 @@ set :session_secret, ENV["SESSION_KEY"] || 'too secret'
 enable :sessions
 
 get '/' do
-  erb :index
+  erb :index, :layout => :application
 end
 
 get '/channels/:channel_id/current_track' do
