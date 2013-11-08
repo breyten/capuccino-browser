@@ -321,7 +321,7 @@ Radiobox2.itemsChanged = function() {
   
   if (Radiobox2Api.data.currentItems.length > 0) {
     $.each(Radiobox2Api.data.currentItems, function (idx, item) {
-      $('#broadcast-items dl').append($('<dt>' + item.name + '</dt><dd>' + item.description + '</dd>'));
+      $('#broadcast-items dl').append($('<dt>' + item.name + '<i class="icon-play"></i></dt><dd>' + item.description + '</dd>'));
     });
   } else {
     $('#broadcast-items dl').html('<dt>Geen items</dt><dd>In deze uitzending zitten geen items</dd');
