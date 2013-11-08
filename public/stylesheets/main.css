@@ -5,3 +5,10 @@
 #radio-info {
   display: none;
 }
+
+#full-programme {
+  padding: 20px;
+}
+.block {
+  background: white;
+}

@@ -10,6 +10,8 @@ var Radiobox2Api = window.Radiobox2Api || {
     _gettingCurrentTrack: false,
     currentSongfile: undefined,
     _gettingCurrentSongfile: false,
+    currentProgram: undefined,
+    _gettingCurrentProgram: false,
     full_channels: {},
     channels: {}
   },
@@ -26,6 +28,10 @@ Radiobox2Api.init = function() {
   setInterval(function() {
     Radiobox2Api.getCurrentTrack();
   }, 10000);
+};
+
+Radiobox2Api.delayed_init = function() {
+  Radiobox2Api.getChannels();  
 };
 
 Radiobox2Api.getChannels = function() {
@@ -291,6 +297,14 @@ Radiobox2.songfileChanged = function() {
   }
 };
 
+Radiobox2.programChanged = function() {
+  var program = Radiobox2Api.data.currentProgram;
+  $('#full-programme img').attr('src', program.image.url);
+  $('#full-programme h1').text(program.name);
+  $('#full-programme p.description').text(program.description);
+  
+};
+
 Radiobox2.init = function() {
   $(document).bind('Radiobox2.channelsReceived', function() {
     Radiobox2.channelsReceived();
@@ -316,7 +330,17 @@ Radiobox2.init = function() {
   }, 1000);
 };
 
+Radiobox2.delayed_init = function() {
+  $(document).bind('Radiobox2.broadcastChanged', function() {
+    Radiobox2.broadcastChanged();
+  }).bind('Radiobox2.programChanged', function() {
+    Radiobox2.programChanged();
+  });
+
+  Radiobox2Api.delayed_init();
+};
+
 $(document).ready(function() {
-  console.log('hoi');
-  Radiobox2.init();
+  //console.log('hoi');
+  //Radiobox2.init();
 });
