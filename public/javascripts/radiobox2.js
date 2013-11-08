@@ -13,7 +13,8 @@ var Radiobox2Api = window.Radiobox2Api || {
     currentProgram: undefined,
     _gettingCurrentProgram: false,
     full_channels: {},
-    channels: {}
+    channels: {},
+    currentSound: undefined
   },
 };
 
@@ -322,7 +323,24 @@ Radiobox2.itemsChanged = function() {
   
   if (Radiobox2Api.data.currentItems.length > 0) {
     $.each(Radiobox2Api.data.currentItems, function (idx, item) {
-      $('#broadcast-items dl').append($('<dt>' + item.name + '<i class="icon-play"></i></dt><dd>' + item.description + '</dd>'));
+      $('#broadcast-items dl').append($('<dt>' + item.name + '&nbsp;<button type="button" class="btn btn-default btn-xs"' +
+        ' data-url="' + item.audiofragment[0].url + '" data-item-id="' + item.id + '">' + 
+        '<span class="glyphicon glyphicon-play"></span>Speel af</button></dt><dd>' + item.description + '</dd>'));
+    });
+    $('#broadcast-items dl button').click(function() {
+      var $icon = $(this).find('span');
+      if ($icon.hasClass('glyphicon-play')) {
+        soundManager.stopAll();
+        var mySound = soundManager.createSound({
+           id: $(this).attr('data-item-id'),
+           url: $(this).attr('data-url')
+         });
+         mySound.play();
+         $icon.parent().html('<span class="glyphicon glyphicon-pause"></span>Pauzeer');
+      } else {
+        soundManager.stopAll();
+        $icon.parent().html('<span class="glyphicon glyphicon-play"></span>Speel af');
+      }
     });
   } else {
     $('#broadcast-items dl').html('<dt>Geen items</dt><dd>In deze uitzending zitten geen items</dd');

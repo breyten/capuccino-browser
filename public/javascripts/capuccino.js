@@ -85,14 +85,14 @@ CapuccinoApi.get_tracks_during_broadcast = function() {
   var broadcast = Radiobox2Api.data.currentBroadcast;
   
   $.get(
-    "http://radiobox2.omroep.nl/track/search.json?q=channel.id:'2' AND startdatetime>'" + broadcast.startdatetime + "' AND stopdatetime<'" + broadcast.stopdatetime + "' AND songfile.id>'0'",
+    "http://radiobox2.omroep.nl/track/search.json?q=channel.id:'2' AND startdatetime>'" + broadcast.startdatetime + "' AND stopdatetime<'" + broadcast.stopdatetime + "' AND songfile.id>'0'&order=startdatetime:desc",
     function (data) {
       console.dir(data);
       $('#tracks ul').html(''); // clear
       CapuccinoApi.data._gettingTracks = false;
       if (data.results.length > 0) {
         $.each(data.results, function (idx, track) {
-          $('#tracks ul').append($('<li>' + track.songfile.artist + ' - ' + track.songfile.title + '</li>'));
+          $('#tracks ul').append($('<li>' + moment(track.startdatetime).format('H:mm') + ' ' + track.songfile.artist + ' - ' + track.songfile.title + '</li>'));
         });
       } else {
         $('#tracks ul').html('<li>Geen nummers afgespeeld helaas ...');
