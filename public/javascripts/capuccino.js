@@ -7,8 +7,9 @@ var CapuccinoApi = window.CapuccinoApi || {
 };
 
 CapuccinoApi.is_live = function() {
-  var d = new Date();
-  return ((d.getDay() == 6) && (d.getHours() >= 9) && (d.getHours() <= 12));
+  //var d = new Date();
+  //return ((d.getDay() == 6) && (d.getHours() >= 9) && (d.getHours() <= 12));
+  return false;
 };
 
 CapuccinoApi.get_latest_broadcast = function() {
